@@ -16,11 +16,13 @@ limitations under the License.
 
 goog.provide('cam.ContainerDetail');
 
-goog.require('cam.BlobItemContainerReact');
 goog.require('goog.object');
 goog.require('goog.string');
 
-cam.ContainerDetail.getAspect = function(detailURL, handlers, history, getSearchSession, thumbnailSize, blobref, searchSession) {
+goog.require('cam.BlobItemContainerReact');
+goog.require('cam.functions');
+
+cam.ContainerDetail.getAspect = function(params, blobref, searchSession) {
 	var m = searchSession.getMeta(blobref);
 	if (m.camliType != 'permanode') {
 		return null;
@@ -31,15 +33,11 @@ cam.ContainerDetail.getAspect = function(detailURL, handlers, history, getSearch
 		return null;
 	}
 
-	return new cam.ContainerDetail.Aspect(detailURL, handlers, history, getSearchSession, thumbnailSize, blobref);
+	return new cam.ContainerDetail.Aspect(params, blobref);
 };
 
-cam.ContainerDetail.Aspect = function(detailURL, handlers, history, getSearchSession, thumbnailSize, blobref) {
-	this.detailURL_ = detailURL;
-	this.handlers_ = handlers;
-	this.history_ = history;
-	this.getSearchSession_ = getSearchSession;
-	this.thumbnailSize_ = thumbnailSize;
+cam.ContainerDetail.Aspect = function(params, blobref) {
+	this.params_ = params;
 	this.blobref_ = blobref;
 };
 
@@ -48,17 +46,16 @@ cam.ContainerDetail.Aspect.prototype.getTitle = function() {
 };
 
 cam.ContainerDetail.Aspect.prototype.createContent = function(size) {
-	if (!this.searchSession) {
-		this.searchSession_ = this.getSearchSession_(this.blobref_);
-	}
 	return cam.BlobItemContainerReact({
-		detailURL: this.detailURL_,
-		handlers: this.handlers_,
-		history: this.history_,
-		searchSession: this.searchSession_,
+		detailURL: this.params_.getDetailURL,
+		handlers: this.params_.handlers,
+		history: this.params_.history,
+		// TODO(aa): For directories and static sets, this will be NULL.
+		onFileDrop: this.handleFileDrop_.bind(this),
+		searchSession: this.getSearchSession_(),
+		// TODO(aa): Support selection.
 		selection: {},
 		style: {
-			background: 'white',
 			height: size.height,
 			left: 0,
 			overflowX: 'hidden',
@@ -67,6 +64,15 @@ cam.ContainerDetail.Aspect.prototype.createContent = function(size) {
 			top: 0,
 			width: size.width,
 		},
-		thumbnailSize: this.thumbnailSize_,
+		thumbnailSize: this.params_.thumbnailSize,
+		timers: this.params_.timers,
 	});
+};
+
+cam.ContainerDetail.Aspect.prototype.getSearchSession_ = cam.functions.cached(function() {
+	return this.params_.getSearchSession(this.blobref_);
+});
+
+cam.ContainerDetail.Aspect.prototype.handleFileDrop_ = function(files) {
+	this.params_.onFileDrop(files, this.blobref_);
 };

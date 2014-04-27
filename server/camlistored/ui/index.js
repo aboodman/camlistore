@@ -19,7 +19,6 @@ goog.provide('cam.IndexPage');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
 goog.require('goog.events.EventHandler');
-goog.require('goog.labs.Promise');
 goog.require('goog.object');
 goog.require('goog.string');
 goog.require('goog.Uri');
@@ -34,6 +33,7 @@ goog.require('cam.BlobItemDemoContent');
 goog.require('cam.ContainerDetail');
 goog.require('cam.DetailView');
 goog.require('cam.DirectoryDetail');
+goog.require('cam.MassUploader');
 goog.require('cam.Navigator');
 goog.require('cam.NavReact');
 goog.require('cam.PermanodeDetail');
@@ -75,7 +75,6 @@ cam.IndexPage = React.createClass({
 	componentWillMount: function() {
 		this.baseURL_ = null;
 		this.currentSet_ = null;
-		this.dragEndTimer_ = 0;
 		this.navigator_ = null;
 		this.searchSession_ = null;
 
@@ -99,7 +98,6 @@ cam.IndexPage = React.createClass({
 
 	componentWillUnmount: function() {
 		this.eh_.dispose();
-		this.clearDragTimer_();
 	},
 
 	getInitialState: function() {
@@ -113,60 +111,11 @@ cam.IndexPage = React.createClass({
 	},
 
 	render: function() {
-		return React.DOM.div({onDragEnter:this.handleDragStart_, onDragOver:this.handleDragStart_, onDrop:this.handleDrop_}, [
+		return React.DOM.div(null, [
 			this.getNav_(),
 			this.getBlobItemContainer_(),
 			this.getDetailView_(),
 		]);
-	},
-
-	handleDragStart_: function(e) {
-		this.clearDragTimer_();
-		e.preventDefault();
-		this.dragEndTimer_ = window.setTimeout(this.handleDragStop_, 2000);
-		goog.dom.classlist.add(this.getDOMNode().parentElement, 'cam-dropactive');
-	},
-
-	handleDragStop_: function() {
-		this.clearDragTimer_();
-		goog.dom.classlist.remove(this.getDOMNode().parentElement, 'cam-dropactive');
-	},
-
-	clearDragTimer_: function() {
-		if (this.dragEndTimer_) {
-			window.clearTimeout(this.dragEndTimer_);
-			this.dragEndTimer_ = 0;
-		}
-	},
-
-	handleDrop_: function(e) {
-		if (!e.nativeEvent.dataTransfer.files) {
-			return;
-		}
-
-		e.preventDefault();
-
-		var files = e.nativeEvent.dataTransfer.files;
-		var numComplete = 0;
-		var sc = this.props.serverConnection;
-
-		console.log('Uploading %d files...', files.length);
-		goog.labs.Promise.all(Array.prototype.map.call(files, function(file) {
-			var upload = new goog.labs.Promise(sc.uploadFile.bind(sc, file));
-			var createPermanode = new goog.labs.Promise(sc.createPermanode.bind(sc));
-			return goog.labs.Promise.all([upload, createPermanode]).then(function(results) {
-				// TODO(aa): Icky manual destructuring of results. Seems like there must be a better way?
-				var fileRef = results[0];
-				var permanodeRef = results[1];
-				return new goog.labs.Promise(sc.newSetAttributeClaim.bind(sc, permanodeRef, 'camliContent', fileRef));
-			}).thenCatch(function(e) {
-				console.error('File upload fall down go boom. file: %s, error: %s', file.name, e);
-			}).then(function() {
-				console.log('%d of %d files complete.', ++numComplete, files.length);
-			});
-		})).then(function() {
-			console.log('All complete');
-		});
 	},
 
 	handleNavigate_: function(newURL) {
@@ -333,10 +282,9 @@ cam.IndexPage = React.createClass({
 		}
 	},
 
-	handleDetailURL_: function(blobref) {
-		var m = this.searchSession_.getMeta(blobref);
-		var rm = this.searchSession_.getResolvedMeta(blobref);
-		return this.getDetailURL_(m.blobRef);
+
+	handleUploadFiles_: function(files, opt_parentBlobref) {
+		cam.MassUploader.upload(this.props.serverConnection, files, opt_parentBlobref || '');
 	},
 
 	getDetailURL_: function(blobref) {
@@ -428,14 +376,16 @@ cam.IndexPage = React.createClass({
 		return cam.BlobItemContainerReact({
 			key: 'blobitemcontainer',
 			ref: 'blobItemContainer',
-			detailURL: this.handleDetailURL_,
+			detailURL: this.getDetailURL_,
 			handlers: this.BLOB_ITEM_HANDLERS_,
 			history: this.props.history,
+			onFileDrop: this.handleUploadFiles_,
 			onSelectionChange: this.handleSelectionChange_,
 			searchSession: this.searchSession_,
 			selection: this.state.selection,
 			style: this.getBlobItemContainerStyle_(),
 			thumbnailSize: this.THUMBNAIL_SIZES_[this.state.thumbnailSizeIndex],
+			timers: this.props.timer,
 		});
 	},
 
@@ -480,7 +430,7 @@ cam.IndexPage = React.createClass({
 			key: 'detailview',
 			aspects: {
 				'image': cam.ImageDetail.getAspect,
-				'container': cam.ContainerDetail.getAspect.bind(null, this.handleDetailURL_, this.BLOB_ITEM_HANDLERS_, this.props.history, this.getChildSearchSession_, this.THUMBNAIL_SIZES_[this.state.thumbnailSizeIndex]),
+				'container': cam.ContainerDetail.getAspect.bind(null, this.getContainerAspectParams_()),
 				'directory': cam.DirectoryDetail.getAspect.bind(null, this.baseURL_),
 				'permanode': cam.PermanodeDetail.getAspect.bind(null, this.baseURL_),
 				'blob': cam.BlobDetail.getAspect.bind(null, this.baseURL_),
@@ -489,12 +439,24 @@ cam.IndexPage = React.createClass({
 			history: this.props.history,
 			searchSession: this.searchSession_,
 			searchURL: searchURL,
-			getDetailURL: this.handleDetailURL_,
+			getDetailURL: this.getDetailURL_,
 			navigator: this.navigator_,
 			keyEventTarget: this.props.eventTarget,
 			width: this.props.availWidth,
 			height: this.props.availHeight,
 		});
+	},
+
+	getContainerAspectParams_: function() {
+		return {
+			getDetailURL: this.getDetailURL_,
+			handlers: this.BLOB_ITEM_HANDLERS_,
+			history: this.props.history,
+			onFileDrop: this.handleUploadFiles_,
+			getSearchSession: this.getChildSearchSession_,
+			thumbnailSize: this.THUMBNAIL_SIZES_[this.state.thumbnailSizeIndex],
+			timers: this.props.timer,
+		};
 	},
 
 	getChildSearchSession_: function(blobref) {

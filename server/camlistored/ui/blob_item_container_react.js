@@ -26,6 +26,7 @@ goog.require('goog.math.Size');
 goog.require('goog.style');
 
 goog.require('cam.BlobItemReact');
+goog.require('cam.DragHelper');
 goog.require('cam.SearchSession');
 
 cam.BlobItemContainerReact = React.createClass({
@@ -44,10 +45,12 @@ cam.BlobItemContainerReact = React.createClass({
 		detailURL: React.PropTypes.func.isRequired,  // string->string (blobref->complete detail URL)
 		handlers: React.PropTypes.array.isRequired,
 		history: React.PropTypes.shape({replaceState:React.PropTypes.func.isRequired}).isRequired,
+		onFileDrop: React.PropTypes.func,
 		onSelectionChange: React.PropTypes.func,
 		searchSession: React.PropTypes.shape({getCurrentResults:React.PropTypes.func.isRequired, addEventListener:React.PropTypes.func.isRequired, loadMoreResults:React.PropTypes.func.isRequired}),
 		selection: React.PropTypes.object.isRequired,
 		style: React.PropTypes.object,
+		timers: React.PropTypes.shape({setTimeout:React.PropTypes.func.isRequired, clearTimeout:React.PropTypes.func.isRequired}).isRequired,
 		thumbnailSize: React.PropTypes.number.isRequired,
 	},
 
@@ -72,6 +75,14 @@ cam.BlobItemContainerReact = React.createClass({
 
 		// TODO(aa): This can be removed when https://code.google.com/p/chromium/issues/detail?id=312427 is fixed and deployed.
 		this.lastWheelItem_ = '';
+
+		if (this.props.onFileDrop) {
+			this.dragHelper_ = new cam.DragHelper(this, this.props.timers);
+			this.dragHelper_.onDragOver = this.handleDragOver_;
+			this.dragHelper_.onDragOut = this.handleDragOut_;
+		} else {
+			this.dragHelper_ = null;
+		}
 	},
 
 	componentDidMount: function() {
@@ -137,7 +148,22 @@ cam.BlobItemContainerReact = React.createClass({
 		// If we haven't filled the window with results, add some more.
 		this.fillVisibleAreaWithResults_();
 
-		return React.DOM.div({className:'cam-blobitemcontainer', style:this.props.style, onMouseDown:this.handleMouseDown_, onScroll:this.handleScroll_}, childControls);
+		var props = {
+			className: React.addons.classSet({
+				'cam-blobitemcontainer': true,
+				'cam-blobitemcontainer-dropactive': this.state.dragover,
+			})	,
+			style: this.props.style,
+			onDrop: this.handleDrop_,
+			onMouseDown: this.handleMouseDown_,
+			onScroll: this.handleScroll_
+		};
+
+		if (this.dragHelper_) {
+			this.dragHelper_.setProps(props);
+		}
+
+		return React.DOM.div(props, childControls);
 	},
 
 	updateChildItems_: function() {
@@ -308,5 +334,25 @@ cam.BlobItemContainerReact = React.createClass({
 		}
 
 		this.props.searchSession.loadMoreResults();
+	},
+
+	handleDragOver_: function(e) {
+		e.preventDefault();
+		this.setState({dragover:true});
+	},
+
+	handleDragOut_: function() {
+		this.setState({dragover:false});
+	},
+
+	handleDrop_: function(e) {
+		this.setState({dragover:false});
+
+		if (!this.props.onFileDrop || !e.nativeEvent.dataTransfer.files) {
+			return;
+		}
+
+		e.preventDefault();
+		this.props.onFileDrop(e.nativeEvent.dataTransfer.files);
 	},
 });
