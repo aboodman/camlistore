@@ -1,0 +1,99 @@
+.cam-header {
+	background: #3a3a3a;
+	border-spacing: 0;
+	border-collapse: 0;
+	border-width: 0;
+	box-shadow: 0.1em 0 0.5em 0.1em rgba(0, 0, 0, 0.4);
+	color: #e4e4e4;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 700;
+	font-size: 13px;
+	height: 36px;
+	left: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 100;
+	-webkit-transform: translateZ(0);
+}
+
+.cam-header-item {
+	cursor: default;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	white-space: nowrap;
+}
+
+.cam-header-title {
+	margin-top: 10px;
+	font-size: 14px;
+}
+
+.cam-header-title span:first-child {
+	margin-right: 5px;
+}
+
+.cam-header-menu-dropdown {
+	box-shadow: 0.1em 0 1em 0.3em rgba(0, 0, 0, 0.25);
+	cursor: default;
+	left: 0;
+	position: fixed;
+	top: 38px;
+	transition: -webkit-transform 100ms ease-out;
+	transition: -moz-transform 100ms ease-out;
+	transition: -ms-transform 100ms ease-out;
+	z-index: 2;
+}
+
+.cam-header-menu-item {
+	background: #3a3a3a;
+	background-position: 8px 11px;
+	background-repeat: no-repeat;
+	background-size: auto 15px;
+	border-top: 1px solid #666;
+	color: #eee;
+	padding: 8px 14px 8px 35px;
+	transition: background-color 100ms ease-out;
+}
+
+.cam-header-menu-item:hover {
+	background-color: #444;
+}
+
+.cam-header input {
+	color: white;
+	height: 30px;
+	width: 100%;
+	background: #444;
+	border: 1px solid #555;
+	outline: none;
+	padding: 1ex;
+	margin-top: 4px;
+	font-size: 110%;
+	font-family: default;
+	font-weight: normal;
+	transition: border-color 100ms ease-out;
+}
+
+.cam-header input:focus {
+	border-color: #777;
+}
+
+.cam-header-sizes {
+	right: 5px;
+	top: 4px;
+}
+
+.cam-header button {
+	color: white;
+	background: transparent;
+	border: 1px outset #666;
+	height: 30px;
+	outline: 0;
+	width: 30px;
+}
+
+.cam-header button:active {
+	border-style: inset;
+}

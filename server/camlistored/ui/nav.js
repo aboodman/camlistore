@@ -25,6 +25,35 @@ goog.require('cam.object');
 goog.require('cam.reactUtil');
 goog.require('cam.style');
 
+// new nav plan
+// ====================
+
+// three parts:
+// - top bar
+// - drop-down menu from top bar
+// - contextual slide out from right
+
+// top bar:
+// - menu button
+// - search box
+// - things that affect the display of the current view:
+//   - view type (future) (icons, list, columns)
+//   - sort (mod, create)
+//   - size
+
+// menu
+// - New Permanode
+// - Upload
+// - Importers (maybe future this is 'Apps')
+// - anything else that is non-contextual
+
+// contextual - displayed when one or more items are selected
+// - add to set...
+// - tags
+// - location
+// - people
+// - clear selection
+// - delete
 cam.Nav = React.createClass({
 	displayName: 'Nav',
 

@@ -35,6 +35,7 @@ goog.require('cam.BlobItemVideoContent');
 goog.require('cam.ContainerDetail');
 goog.require('cam.DetailView');
 goog.require('cam.DirectoryDetail');
+goog.require('cam.Header');
 goog.require('cam.Navigator');
 goog.require('cam.Nav');
 goog.require('cam.PermanodeDetail');
@@ -45,6 +46,7 @@ goog.require('cam.ServerConnection');
 cam.IndexPage = React.createClass({
 	displayName: 'IndexPage',
 
+	NAV_HEIGHT_CLOSED_: 36,
 	NAV_WIDTH_CLOSED_: 36,
 	NAV_WIDTH_OPEN_: 239,
 
@@ -71,6 +73,7 @@ cam.IndexPage = React.createClass({
 		eventTarget: React.PropTypes.shape({addEventListener:React.PropTypes.func.isRequired}).isRequired,
 		history: React.PropTypes.shape({pushState:React.PropTypes.func.isRequired, replaceState:React.PropTypes.func.isRequired, go:React.PropTypes.func.isRequired, state:React.PropTypes.object}).isRequired,
 		location: React.PropTypes.shape({href:React.PropTypes.string.isRequired, reload:React.PropTypes.func.isRequired}).isRequired,
+		scrolling: cam.BlobItemContainerReact.originalSpec.propTypes.scrolling,
 		serverConnection: React.PropTypes.instanceOf(cam.ServerConnection).isRequired,
 		timer: cam.Nav.originalSpec.propTypes.timer,
 	},
@@ -81,9 +84,6 @@ cam.IndexPage = React.createClass({
 		this.dragEndTimer_ = 0;
 		this.navigator_ = null;
 		this.searchSession_ = null;
-
-		// TODO(aa): Move this to index.css once conversion to React is complete (index.css is shared between React and non-React).
-		goog.dom.getDocumentScrollElement().style.overflow = 'hidden';
 
 		this.eh_ = new goog.events.EventHandler(this);
 
@@ -217,18 +217,11 @@ cam.IndexPage = React.createClass({
 		if (!this.isSearchMode_(this.state.currentURL)) {
 			return null;
 		}
-		return cam.Nav({key:'nav', ref:'nav', timer:this.props.timer, open:this.state.isNavOpen, onOpen:this.handleNavOpen_, onClose:this.handleNavClose_}, [
-			cam.Nav.SearchItem({key:'search', ref:'search', iconSrc:'magnifying_glass.svg', onSearch:this.setSearch_}, 'Search'),
-			this.getCreateSetWithSelectionItem_(),
-			cam.Nav.Item({key:'roots', iconSrc:'icon_27307.svg', onClick:this.handleShowSearchRoots_}, 'Search roots'),
-			this.getSelectAsCurrentSetItem_(),
-			this.getAddToCurrentSetItem_(),
-			this.getClearSelectionItem_(),
-			this.getDeleteSelectionItem_(),
-			cam.Nav.Item({key:'up', iconSrc:'up.svg', onClick:this.handleEmbiggen_}, 'Moar bigger'),
-			cam.Nav.Item({key:'down', iconSrc:'down.svg', onClick:this.handleEnsmallen_}, 'Less bigger'),
-			cam.Nav.LinkItem({key:'logo', iconSrc:'/favicon.ico', href:this.baseURL_.toString(), extraClassName:'cam-logo'}, 'Camlistore'),
-		]);
+		return cam.Header({
+			width: this.props.availWidth,
+			timer: this.props.timer,
+			height: 38,
+		});
 	},
 
 	handleNavOpen_: function() {
@@ -454,6 +447,8 @@ cam.IndexPage = React.createClass({
 			handlers: this.BLOB_ITEM_HANDLERS_,
 			history: this.props.history,
 			onSelectionChange: this.handleSelectionChange_,
+			paddingTop: this.NAV_HEIGHT_CLOSED_,
+			scrolling: this.props.scrolling,
 			searchSession: this.searchSession_,
 			selection: this.state.selection,
 			style: this.getBlobItemContainerStyle_(),
@@ -464,9 +459,7 @@ cam.IndexPage = React.createClass({
 	getBlobItemContainerStyle_: function() {
 		// TODO(aa): Constant values can go into CSS when we switch over to react.
 		var style = {
-			left: this.NAV_WIDTH_CLOSED_,
-			overflowX: 'hidden',
-			overflowY: 'scroll',
+			left: 0,
 			position: 'absolute',
 			top: 0,
 			width: this.getContentWidth_(),
@@ -531,6 +524,6 @@ cam.IndexPage = React.createClass({
 	},
 
 	getContentWidth_: function() {
-		return this.props.availWidth - this.NAV_WIDTH_CLOSED_;
+		return this.props.availWidth;
 	},
 });
