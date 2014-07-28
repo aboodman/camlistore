@@ -50,7 +50,7 @@ cam.IndexPage = React.createClass({
 	SEARCH_PREFIX_: {
 		RAW: 'raw'
 	},
-	SIDEBAR_WIDTH_: 225,
+	SIDEBAR_WIDTH_: 195,
 	THUMBNAIL_SIZES_: [75, 100, 150, 200, 250, 300],
 
 	// Note that these are ordered by priority.
@@ -237,10 +237,10 @@ cam.IndexPage = React.createClass({
 				timer: this.props.timer,
 				open: this.isSidebarOpen_(),
 			},
+			this.getClearSelectionItem_(),
 			this.getCreateSetWithSelectionItem_(),
 			this.getSelectAsCurrentSetItem_(),
 			this.getAddToCurrentSetItem_(),
-			this.getClearSelectionItem_(),
 			this.getDeleteSelectionItem_()
 		);
 	},

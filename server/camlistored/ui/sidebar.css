@@ -15,19 +15,20 @@ limitations under the License.
 */
 
 .cam-sidebar {
-	background: #3a3a3a;
-	box-shadow: 0.1em 0 1em 0.3em rgba(0, 0, 0, 0.25);
+	background: #eee;
+	box-shadow: 0.1em 0 1em 0.1em rgba(0, 0, 0, 0.25);
 	font-family: 'Open Sans', sans-serif;
 	opacity: 0;
 	overflow: hidden;
 	position: fixed;
 	right: 0;
 	top: 38px;
-	-moz-transform: translate3d(0, -100%, 0);
-	-ms-transform: translate3d(0, -100%, 0);
-	-webkit-transform: translate3d(0, -100%, 0);
-	transition: opacity,transform 75ms ease-out;
-	width: 225px;
+	-moz-transform: translate3d(100%, 0, 0);
+	-ms-transform: translate3d(100%, 0, 0);
+	-webkit-transform: translate3d(100%, 0, 0);
+	transition: 75ms ease-out;
+	transition-property: opacity,transform;
+	width: 190px;
 	z-index: 2;
 }
 
@@ -39,38 +40,29 @@ limitations under the License.
 }
 
 .cam-sidebar-item {
-	background-color: transparent;
-	background-position: 8px center;
-	background-repeat: no-repeat;
-	background-size: auto 17px;
+	background: transparent;
 	border: none;
-	color: rgba(255, 255, 255, 1);
+	color: #222;
 	cursor: pointer;
 	font-family: inherit;
-	font-size: 19px;
+	font-size: 15px;
 	font-weight: 400;
 	margin: 0;
 	opacity: 0.9;
-	padding: 8px 11px 8px 36px;
+	outline: none!important;
+	padding: 8px 11px 9px 11px;
 	text-align: left;
 	transition: color 300ms ease-out;
 	white-space: nowrap;
 	width: 100%;
 
 	/* This is a bummer, but it appears that different fonts can actually layout at different heights for the same pixel size, thus we get a layout glitch during load when the font load completes. 42px is the minimum of the size that Firefox and Chrome render this box at with the above font size, padding, etc. */
-	min-height: 42px;
+	min-height: 36px;
 }
 
 .cam-sidebar-item:hover,
 .cam-sidebar-item:focus {
-	background-color: rgb(60, 60, 60);
-}
-
-.cam-sidebar-searchitem:hover,
-.cam-sidebar-searchitem:focus,
-.cam-logo:hover,
-.cam-logo:focus {
-	background-color:inherit!important;
+	background-color: #ddd;
 }
 
 .cam-sidebar-item:first-child {

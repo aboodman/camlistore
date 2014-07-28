@@ -63,7 +63,6 @@ cam.Sidebar.ItemBase = {
 		}
 		return {
 			className: className,
-			style: {backgroundImage:cam.style.getURLValue(this.props.iconSrc)},
 		};
 	},
 };
