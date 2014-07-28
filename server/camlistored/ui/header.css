@@ -77,7 +77,8 @@
 }
 
 .cam-header input:focus {
-	border-color: #777;
+	background: #4c4c4c;
+	border-color: #6a6a6a;
 }
 
 .cam-header-sizes {

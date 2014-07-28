@@ -38,9 +38,20 @@ cam.Header = React.createClass({
 	},
 
 	propTypes: {
+		currentSearch: React.PropTypes.string,
 		height: React.PropTypes.number.isRequired,
+		onBigger: React.PropTypes.func,
+		onNewPermanode: React.PropTypes.func,
+		onSearch: React.PropTypes.func,
+		onSearchRoots: React.PropTypes.func,
+		onSmaller: React.PropTypes.func,
 		timer: React.PropTypes.shape({setTimeout:React.PropTypes.func.isRequired, clearTimeout:React.PropTypes.func.isRequired}).isRequired,
 		width: React.PropTypes.number.isRequired,
+	},
+
+	focusSearch: function() {
+		this.getSearchNode_().focus();
+		this.getSearchNode_().select();
 	},
 
 	getInitialState: function() {
@@ -116,8 +127,17 @@ cam.Header = React.createClass({
 					width: this.props.width - this.SEARCH_MARGIN.LEFT - this.SEARCH_MARGIN.RIGHT,
 				}
 			},
-			React.DOM.input(
-				{ placeholder: 'Search...' }
+			React.DOM.form(
+				{
+					onSubmit: this.handleSearchSubmit_,
+				},
+				React.DOM.input(
+					{
+						defaultValue: this.props.currentSearch,
+						placeholder: 'Search...',
+						ref: 'searchbox',
+					}
+				)
 			)
 		)
 	},
@@ -126,11 +146,17 @@ cam.Header = React.createClass({
 		return React.DOM.div(
 			{ className: 'cam-header-item cam-header-sizes' },
 			React.DOM.button(
-				{title: 'Moar bigger'},
+				{
+					onClick: this.props.onBigger,
+					title: 'Moar bigger',
+				},
 				'+'
 			),
 			React.DOM.button(
-				{title: 'Less bigger'},
+				{
+					onClick: this.props.onSmaller,
+					title: 'Less bigger'
+				},
 				'-'
 			)
 		);
@@ -140,21 +166,23 @@ cam.Header = React.createClass({
 		return React.DOM.div(
 			{
 				className: 'cam-header-menu-dropdown',
+				onClick: this.handleDropdownClick_,
 				onMouseEnter: this.handleMouseEnter_,
 				onMouseLeave: this.handleMouseLeave_,
 				style: cam.reactUtil.getVendorProps({
 					transform: 'translate3d(0, ' + this.getMenuTranslate_() + '%, 0)',
 				}),
 			},
-			this.getMenuItem_('circled_plus.svg', 'New permanode'),
-			this.getMenuItem_('icon_27307.svg', 'Search roots')
+			this.getMenuItem_('circled_plus.svg', 'New permanode', this.props.onNewPermanode),
+			this.getMenuItem_('icon_27307.svg', 'Search roots', this.props.onSearchRoots)
 		);
 	},
 
-	getMenuItem_: function(icon, text) {
+	getMenuItem_: function(icon, text, handler) {
 		return React.DOM.div(
 			{
 				className: 'cam-header-menu-item',
+				onClick: handler,
 				style: {
 					backgroundImage: cam.style.getURLValue(icon),
 				},
@@ -194,8 +222,13 @@ cam.Header = React.createClass({
 		this.setTimer_();
 	},
 
+	handleDropdownClick_: function() {
+		this.clearTimer_();
+		this.setState({menuVisible:false});
+	},
+
 	setTimer_: function() {
-		this.timerId_ = this.props.timer.setTimeout(this.handleTimer_, 1000);
+		this.timerId_ = this.props.timer.setTimeout(this.handleTimer_, 500);
 	},
 
 	clearTimer_: function() {
@@ -206,5 +239,14 @@ cam.Header = React.createClass({
 
 	handleTimer_: function() {
 		this.setState({menuVisible:false});
+	},
+
+	handleSearchSubmit_: function(e) {
+		this.props.onSearch(this.getSearchNode_().value);
+		e.preventDefault();
+	},
+
+	getSearchNode_: function() {
+		return this.refs['searchbox'].getDOMNode();
 	},
 });

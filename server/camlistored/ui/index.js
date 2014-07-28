@@ -218,9 +218,16 @@ cam.IndexPage = React.createClass({
 			return null;
 		}
 		return cam.Header({
-			width: this.props.availWidth,
-			timer: this.props.timer,
+			currentSearch: this.state.currentURL.getParameterValue('q'),
 			height: 38,
+			onBigger: this.handleEmbiggen_,
+			onNewPermanode: this.handleCreateSetWithSelection_,
+			onSearch: this.setSearch_,
+			onSearchRoots: this.handleShowSearchRoots_,
+			onSmaller: this.handleEnsmallen_,
+			ref: 'header',
+			timer: this.props.timer,
+			width: this.props.availWidth,
 		});
 	},
 
@@ -331,8 +338,7 @@ cam.IndexPage = React.createClass({
 
 		switch (String.fromCharCode(e.charCode)) {
 			case '/': {
-				this.refs.nav.open();
-				this.refs.search.focus();
+				this.refs['header'].focusSearch();
 				e.preventDefault();
 				break;
 			}
