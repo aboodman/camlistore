@@ -1,0 +1,78 @@
+/*
+Copyright 2013 The Camlistore Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.cam-sidebar {
+	background: #3a3a3a;
+	box-shadow: 0.1em 0 1em 0.3em rgba(0, 0, 0, 0.25);
+	font-family: 'Open Sans', sans-serif;
+	opacity: 0;
+	overflow: hidden;
+	position: fixed;
+	right: 0;
+	top: 38px;
+	-moz-transform: translate3d(0, -100%, 0);
+	-ms-transform: translate3d(0, -100%, 0);
+	-webkit-transform: translate3d(0, -100%, 0);
+	transition: opacity,transform 75ms ease-out;
+	width: 225px;
+	z-index: 2;
+}
+
+.cam-sidebar-open {
+	opacity: 1;
+	-moz-transform: translate3d(0, 0, 0);
+	-ms-transform: translate3d(0, 0, 0);
+	-webkit-transform: translate3d(0, 0, 0);
+}
+
+.cam-sidebar-item {
+	background-color: transparent;
+	background-position: 8px center;
+	background-repeat: no-repeat;
+	background-size: auto 17px;
+	border: none;
+	color: rgba(255, 255, 255, 1);
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 19px;
+	font-weight: 400;
+	margin: 0;
+	opacity: 0.9;
+	padding: 8px 11px 8px 36px;
+	text-align: left;
+	transition: color 300ms ease-out;
+	white-space: nowrap;
+	width: 100%;
+
+	/* This is a bummer, but it appears that different fonts can actually layout at different heights for the same pixel size, thus we get a layout glitch during load when the font load completes. 42px is the minimum of the size that Firefox and Chrome render this box at with the above font size, padding, etc. */
+	min-height: 42px;
+}
+
+.cam-sidebar-item:hover,
+.cam-sidebar-item:focus {
+	background-color: rgb(60, 60, 60);
+}
+
+.cam-sidebar-searchitem:hover,
+.cam-sidebar-searchitem:focus,
+.cam-logo:hover,
+.cam-logo:focus {
+	background-color:inherit!important;
+}
+
+.cam-sidebar-item:first-child {
+	margin-top: 2px;
+}

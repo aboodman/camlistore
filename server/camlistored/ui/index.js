@@ -37,24 +37,21 @@ goog.require('cam.DetailView');
 goog.require('cam.DirectoryDetail');
 goog.require('cam.Header');
 goog.require('cam.Navigator');
-goog.require('cam.Nav');
 goog.require('cam.PermanodeDetail');
 goog.require('cam.reactUtil');
 goog.require('cam.SearchSession');
 goog.require('cam.ServerConnection');
+goog.require('cam.Sidebar');
 
 cam.IndexPage = React.createClass({
 	displayName: 'IndexPage',
 
-	NAV_HEIGHT_CLOSED_: 36,
-	NAV_WIDTH_CLOSED_: 36,
-	NAV_WIDTH_OPEN_: 239,
-
-	THUMBNAIL_SIZES_: [75, 100, 150, 200, 250, 300],
-
+	HEADER_HEIGHT_: 38,
 	SEARCH_PREFIX_: {
 		RAW: 'raw'
 	},
+	SIDEBAR_WIDTH_: 225,
+	THUMBNAIL_SIZES_: [75, 100, 150, 200, 250, 300],
 
 	// Note that these are ordered by priority.
 	BLOB_ITEM_HANDLERS_: [
@@ -75,7 +72,7 @@ cam.IndexPage = React.createClass({
 		location: React.PropTypes.shape({href:React.PropTypes.string.isRequired, reload:React.PropTypes.func.isRequired}).isRequired,
 		scrolling: cam.BlobItemContainerReact.originalSpec.propTypes.scrolling,
 		serverConnection: React.PropTypes.instanceOf(cam.ServerConnection).isRequired,
-		timer: cam.Nav.originalSpec.propTypes.timer,
+		timer: cam.Sidebar.originalSpec.propTypes.timer,
 	},
 
 	componentWillMount: function() {
@@ -112,7 +109,6 @@ cam.IndexPage = React.createClass({
 		return {
 			currentURL: null,
 			dropActive: false,
-			isNavOpen: false,
 			selection: {},
 			thumbnailSizeIndex: 3,
 		};
@@ -120,9 +116,10 @@ cam.IndexPage = React.createClass({
 
 	render: function() {
 		return React.DOM.div({onDragEnter:this.handleDragStart_, onDragOver:this.handleDragStart_, onDrop:this.handleDrop_}, [
-			this.getNav_(),
+			this.getHeader_(),
 			this.getBlobItemContainer_(),
 			this.getDetailView_(),
+			this.getSidebar_(),
 		]);
 	},
 
@@ -213,7 +210,7 @@ cam.IndexPage = React.createClass({
 		this.searchSession_ = new cam.SearchSession(this.props.serverConnection, newURL.clone(), query);
 	},
 
-	getNav_: function() {
+	getHeader_: function() {
 		if (!this.isSearchMode_(this.state.currentURL)) {
 			return null;
 		}
@@ -231,14 +228,21 @@ cam.IndexPage = React.createClass({
 		});
 	},
 
-	handleNavOpen_: function() {
-		this.setState({isNavOpen:true});
-	},
-
-	handleNavClose_: function() {
-		this.refs.search.clear();
-		this.refs.search.blur();
-		this.setState({isNavOpen:false});
+	getSidebar_: function() {
+		if (!this.isSearchMode_(this.state.currentURL)) {
+			return null;
+		}
+		return cam.Sidebar({
+				height: this.props.availHeight - 38,
+				timer: this.props.timer,
+				open: this.isSidebarOpen_(),
+			},
+			this.getCreateSetWithSelectionItem_(),
+			this.getSelectAsCurrentSetItem_(),
+			this.getAddToCurrentSetItem_(),
+			this.getClearSelectionItem_(),
+			this.getDeleteSelectionItem_()
+		);
 	},
 
 	handleNewPermanode_: function() {
@@ -383,14 +387,14 @@ cam.IndexPage = React.createClass({
 			return null;
 		}
 
-		return cam.Nav.Item({key:'selectascurrent', iconSrc:'target.svg', onClick:this.handleSelectAsCurrentSet_}, 'Select as current set');
+		return cam.Sidebar.Item({key:'selectascurrent', iconSrc:'target.svg', onClick:this.handleSelectAsCurrentSet_}, 'Select as current set');
 	},
 
 	getAddToCurrentSetItem_: function() {
 		if (!this.currentSet_ || !goog.object.getAnyKey(this.state.selection)) {
 			return null;
 		}
-		return cam.Nav.Item({key:'addtoset', iconSrc:'icon_16716.svg', onClick:this.handleAddToSet_}, 'Add to current set');
+		return cam.Sidebar.Item({key:'addtoset', iconSrc:'icon_16716.svg', onClick:this.handleAddToSet_}, 'Add to current set');
 	},
 
 	getCreateSetWithSelectionItem_: function() {
@@ -401,14 +405,14 @@ cam.IndexPage = React.createClass({
 		} else if (numItems > 1) {
 			label += goog.string.subs(' with %s items', numItems);
 		}
-		return cam.Nav.Item({key:'createsetwithselection', iconSrc:'circled_plus.svg', onClick:this.handleCreateSetWithSelection_}, label);
+		return cam.Sidebar.Item({key:'createsetwithselection', iconSrc:'circled_plus.svg', onClick:this.handleCreateSetWithSelection_}, label);
 	},
 
 	getClearSelectionItem_: function() {
 		if (!goog.object.getAnyKey(this.state.selection)) {
 			return null;
 		}
-		return cam.Nav.Item({key:'clearselection', iconSrc:'clear.svg', onClick:this.handleClearSelection_}, 'Clear selection');
+		return cam.Sidebar.Item({key:'clearselection', iconSrc:'clear.svg', onClick:this.handleClearSelection_}, 'Clear selection');
 	},
 
 	getDeleteSelectionItem_: function() {
@@ -423,7 +427,7 @@ cam.IndexPage = React.createClass({
 			label += goog.string.subs(' (%s) selected items', numItems);
 		}
 		// TODO(mpl): better icon in another CL, with Font Awesome.
-		return cam.Nav.Item({key:'deleteselection', iconSrc:'trash.svg', onClick:this.handleDeleteSelection_}, label);
+		return cam.Sidebar.Item({key:'deleteselection', iconSrc:'trash.svg', onClick:this.handleDeleteSelection_}, label);
 	},
 
 	handleSelectionChange_: function(newSelection) {
@@ -453,7 +457,7 @@ cam.IndexPage = React.createClass({
 			handlers: this.BLOB_ITEM_HANDLERS_,
 			history: this.props.history,
 			onSelectionChange: this.handleSelectionChange_,
-			paddingTop: this.NAV_HEIGHT_CLOSED_,
+			paddingTop: this.HEADER_HEIGHT_,
 			scrolling: this.props.scrolling,
 			searchSession: this.searchSession_,
 			selection: this.state.selection,
@@ -472,17 +476,17 @@ cam.IndexPage = React.createClass({
 		};
 
 		var closedWidth = style.width;
-		var openWidth = closedWidth - this.NAV_WIDTH_OPEN_;
+		var openWidth = closedWidth - this.SIDEBAR_WIDTH_;
 		var openScale = openWidth / closedWidth;
 
 		// TODO(aa): This can move to CSS when the conversion to React is complete.
-		style[cam.reactUtil.getVendorProp('transformOrigin')] = 'right top 0';
+		style[cam.reactUtil.getVendorProp('transformOrigin')] = 'left top 0';
 
 		// The 3d transform is important. See: https://code.google.com/p/camlistore/issues/detail?id=284.
-		var scale = this.state.isNavOpen ? openScale : 1;
+		var scale = this.isSidebarOpen_() ? openScale : 1;
 		style[cam.reactUtil.getVendorProp('transform')] = goog.string.subs('scale3d(%s, %s, 1)', scale, scale);
 
-		style.height = this.state.isNavOpen ? this.props.availHeight / scale : this.props.availHeight;
+		style.height = this.isSidebarOpen_() ? this.props.availHeight / scale : this.props.availHeight;
 
 		return style;
 	},
@@ -531,5 +535,9 @@ cam.IndexPage = React.createClass({
 
 	getContentWidth_: function() {
 		return this.props.availWidth;
+	},
+
+	isSidebarOpen_: function() {
+		return Boolean(goog.object.getAnyKey(this.state.selection));
 	},
 });
