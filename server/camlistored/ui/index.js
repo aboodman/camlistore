@@ -214,19 +214,22 @@ cam.IndexPage = React.createClass({
 		if (!this.isSearchMode_(this.state.currentURL)) {
 			return null;
 		}
-		return cam.Header({
-			currentSearch: this.state.currentURL.getParameterValue('q'),
-			height: 38,
-			onBigger: this.handleEmbiggen_,
-			onNewPermanode: this.handleCreateSetWithSelection_,
-			onSearch: this.setSearch_,
-			onSearchRoots: this.handleShowSearchRoots_,
-			onSmaller: this.handleEnsmallen_,
-			ref: 'header',
-			subActive: this.isSidebarOpen_(),
-			timer: this.props.timer,
-			width: this.props.availWidth,
-		});
+		return cam.Header(
+			{
+				currentSearch: this.state.currentURL.getParameterValue('q'),
+				height: 38,
+				onBigger: this.handleEmbiggen_,
+				onNewPermanode: this.handleCreateSetWithSelection_,
+				onSearch: this.setSearch_,
+				onSearchRoots: this.handleShowSearchRoots_,
+				onSmaller: this.handleEnsmallen_,
+				ref: 'header',
+				subActive: this.isSidebarOpen_(),
+				timer: this.props.timer,
+				width: this.props.availWidth,
+			},
+			this.getClearSelectionItem_()
+		)
 	},
 
 	getSidebar_: function() {
@@ -414,7 +417,7 @@ cam.IndexPage = React.createClass({
 		if (!goog.object.getAnyKey(this.state.selection)) {
 			return null;
 		}
-		return cam.Sidebar.Item({key:'clearselection', iconSrc:'clear.svg', onClick:this.handleClearSelection_}, 'Clear selection');
+		return React.DOM.button({key:'clearselection', onClick:this.handleClearSelection_}, 'Clear selection');
 	},
 
 	getDeleteSelectionItem_: function() {

@@ -27,9 +27,6 @@
 
 .cam-header-sub {
 	background: #eee;
-	color: #333;
-	font-size: 12px;
-	font-weight: normal;
 	height: 36px;
 	left: 0;
 	position: absolute;
@@ -90,7 +87,7 @@
 	background-color: #444;
 }
 
-.cam-header input {
+.cam-header-main input {
 	color: white;
 	height: 30px;
 	width: 100%;
@@ -105,7 +102,7 @@
 	transition: border-color 100ms ease-out;
 }
 
-.cam-header input:focus {
+.cam-header-main input:focus {
 	background: #4c4c4c;
 	border-color: #888;
 }
@@ -115,7 +112,7 @@
 	top: 4px;
 }
 
-.cam-header button {
+.cam-header-main button {
 	color: white;
 	background: transparent;
 	border: 1px outset #666;
@@ -124,6 +121,27 @@
 	width: 30px;
 }
 
-.cam-header button:active {
+.cam-header-main button:active {
 	border-style: inset;
+}
+
+.cam-header-sub button {
+	background: transparent;
+	border: none;
+	color: #444;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 600;
+	font-size: 12px;
+	height: 36px;
+	padding-left: 2em;
+	padding-right: 2em;
+	white-space: nowrap;
+}
+
+.cam-header-sub button:hover {
+	background: #ddd;
+}
+
+.cam-header-sub button:active {
+	outline: none;
 }
