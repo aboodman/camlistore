@@ -162,10 +162,10 @@ cam.ImageDetail = React.createClass({
 						'detail-view-piggy': true,
 						'detail-view-piggy-backward': this.props.backwardPiggy
 					}),
+					numFrames: 24,
 					spriteWidth: this.PIGGY_WIDTH,
 					spriteHeight: this.PIGGY_HEIGHT,
 					sheetWidth: 8,
-					sheetHeight: 3,
 					interval: 30,
 					style: this.getCenteredProps_(this.PIGGY_WIDTH, this.PIGGY_HEIGHT)
 				}));

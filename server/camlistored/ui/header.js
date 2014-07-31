@@ -178,19 +178,16 @@ cam.Header = React.createClass({
 					transform: 'translate3d(0, ' + this.getMenuTranslate_() + '%, 0)',
 				}),
 			},
-			this.getMenuItem_('circled_plus.svg', 'New permanode', this.props.onNewPermanode),
-			this.getMenuItem_('icon_27307.svg', 'Search roots', this.props.onSearchRoots)
+			this.getMenuItem_('New permanode', this.props.onNewPermanode),
+			this.getMenuItem_('Search roots', this.props.onSearchRoots)
 		);
 	},
 
-	getMenuItem_: function(icon, text, handler) {
+	getMenuItem_: function(text, handler) {
 		return React.DOM.div(
 			{
 				className: 'cam-header-menu-item',
 				onClick: handler,
-				style: {
-					backgroundImage: cam.style.getURLValue(icon),
-				},
 			},
 			text
 		);
