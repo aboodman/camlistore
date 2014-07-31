@@ -13,7 +13,7 @@
 	background: #3a3a3a;
 	box-shadow: 0.1em 0 0.5em 0.1em rgba(0, 0, 0, 0.4);
 	color: #e4e4e4;
-	height: 36px;
+	height: 38px;
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -31,7 +31,7 @@
 	left: 0;
 	position: absolute;
 	text-align: center;
-	top: 36px;
+	top: 38px;
 	width: 100%;
 	-webkit-transform: translate3d(0, -100%, 0);
 	-webkit-transition: transform 75ms ease-out;
@@ -65,7 +65,7 @@
 	cursor: default;
 	left: 0;
 	position: absolute;
-	top: 36px;
+	top: 38px;
 	transition: -webkit-transform 100ms ease-out;
 	transition: -moz-transform 100ms ease-out;
 	transition: -ms-transform 100ms ease-out;
