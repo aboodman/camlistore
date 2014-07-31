@@ -454,6 +454,7 @@ cam.IndexPage = React.createClass({
 			selection: this.state.selection,
 			style: this.getBlobItemContainerStyle_(),
 			thumbnailSize: this.THUMBNAIL_SIZES_[this.state.thumbnailSizeIndex],
+			translateY: goog.object.getAnyKey(this.state.selection) ? 36 : 0,
 		});
 	},
 

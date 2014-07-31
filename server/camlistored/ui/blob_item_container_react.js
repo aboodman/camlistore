@@ -55,6 +55,7 @@ cam.BlobItemContainerReact = React.createClass({
 		selection: React.PropTypes.object.isRequired,
 		style: React.PropTypes.object,
 		thumbnailSize: React.PropTypes.number.isRequired,
+		translateY: React.PropTypes.number,
 	},
 
 	getDefaultProps: function() {
@@ -146,8 +147,10 @@ cam.BlobItemContainerReact = React.createClass({
 		return React.DOM.div(
 			{
 				className: 'cam-blobitemcontainer',
-				style:this.props.style,
-				onMouseDown: this.handleMouseDown_
+				style: cam.object.extend(this.props.style, cam.reactUtil.getVendorProps({
+					transform: 'translateY(' + (this.props.translateY || 0) + 'px)',
+				})),
+				onMouseDown: this.handleMouseDown_,
 			},
 			childControls
 		);
