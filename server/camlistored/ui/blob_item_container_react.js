@@ -153,16 +153,6 @@ cam.BlobItemContainerReact = React.createClass({
 		);
 	},
 
-	getRenderedPosition_: function(y) {
-		var origin = this.getTransformOrigin_() * this.layoutHeight_;
-		var retval = origin + ((y - origin) * this.props.scale);
-		return retval;
-	},
-
-	getTransformOrigin_: function() {
-		return this.state.scroll / (this.layoutHeight_ - this.props.style.height);
-	},
-
 	updateChildItems_: function() {
 		if (this.childItems_ !== null) {
 			return;
@@ -266,7 +256,6 @@ cam.BlobItemContainerReact = React.createClass({
 	},
 
 	isVisible_: function(y) {
-		y = this.getRenderedPosition_(y);
 		return y >= this.state.scroll && y < (this.state.scroll + this.props.style.height);
 	},
 

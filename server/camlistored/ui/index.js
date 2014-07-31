@@ -41,7 +41,6 @@ goog.require('cam.PermanodeDetail');
 goog.require('cam.reactUtil');
 goog.require('cam.SearchSession');
 goog.require('cam.ServerConnection');
-goog.require('cam.Sidebar');
 
 cam.IndexPage = React.createClass({
 	displayName: 'IndexPage',
@@ -72,7 +71,7 @@ cam.IndexPage = React.createClass({
 		location: React.PropTypes.shape({href:React.PropTypes.string.isRequired, reload:React.PropTypes.func.isRequired}).isRequired,
 		scrolling: cam.BlobItemContainerReact.originalSpec.propTypes.scrolling,
 		serverConnection: React.PropTypes.instanceOf(cam.ServerConnection).isRequired,
-		timer: cam.Sidebar.originalSpec.propTypes.timer,
+		timer: cam.Header.originalSpec.propTypes.timer,
 	},
 
 	componentWillMount: function() {
@@ -119,7 +118,6 @@ cam.IndexPage = React.createClass({
 			this.getHeader_(),
 			this.getBlobItemContainer_(),
 			this.getDetailView_(),
-			this.getSidebar_(),
 		]);
 	},
 
@@ -224,30 +222,15 @@ cam.IndexPage = React.createClass({
 				onSearchRoots: this.handleShowSearchRoots_,
 				onSmaller: this.handleEnsmallen_,
 				ref: 'header',
-				subActive: this.isSidebarOpen_(),
 				timer: this.props.timer,
 				width: this.props.availWidth,
-			},
-			this.getClearSelectionItem_()
-		)
-	},
-
-	getSidebar_: function() {
-		return null;
-		if (!this.isSearchMode_(this.state.currentURL)) {
-			return null;
-		}
-		return cam.Sidebar({
-				height: this.props.availHeight - 38,
-				timer: this.props.timer,
-				open: this.isSidebarOpen_(),
 			},
 			this.getClearSelectionItem_(),
 			this.getCreateSetWithSelectionItem_(),
 			this.getSelectAsCurrentSetItem_(),
 			this.getAddToCurrentSetItem_(),
 			this.getDeleteSelectionItem_()
-		);
+		)
 	},
 
 	handleNewPermanode_: function() {
@@ -392,25 +375,28 @@ cam.IndexPage = React.createClass({
 			return null;
 		}
 
-		return cam.Sidebar.Item({key:'selectascurrent', iconSrc:'target.svg', onClick:this.handleSelectAsCurrentSet_}, 'Select as current set');
+		return React.DOM.button({key:'selectascurrent', onClick:this.handleSelectAsCurrentSet_}, 'Select as current set');
 	},
 
 	getAddToCurrentSetItem_: function() {
 		if (!this.currentSet_ || !goog.object.getAnyKey(this.state.selection)) {
 			return null;
 		}
-		return cam.Sidebar.Item({key:'addtoset', iconSrc:'icon_16716.svg', onClick:this.handleAddToSet_}, 'Add to current set');
+		return React.DOM.button({key:'addtoset', onClick:this.handleAddToSet_}, 'Add to current set');
 	},
 
 	getCreateSetWithSelectionItem_: function() {
 		var numItems = goog.object.getCount(this.state.selection);
+		if (numItems == 0) {
+			return null;
+		}
 		var label = 'Create set';
 		if (numItems == 1) {
 			label += ' with item';
 		} else if (numItems > 1) {
 			label += goog.string.subs(' with %s items', numItems);
 		}
-		return cam.Sidebar.Item({key:'createsetwithselection', iconSrc:'circled_plus.svg', onClick:this.handleCreateSetWithSelection_}, label);
+		return React.DOM.button({key:'createsetwithselection', onClick:this.handleCreateSetWithSelection_}, label);
 	},
 
 	getClearSelectionItem_: function() {
@@ -432,7 +418,7 @@ cam.IndexPage = React.createClass({
 			label += goog.string.subs(' (%s) selected items', numItems);
 		}
 		// TODO(mpl): better icon in another CL, with Font Awesome.
-		return cam.Sidebar.Item({key:'deleteselection', iconSrc:'trash.svg', onClick:this.handleDeleteSelection_}, label);
+		return React.DOM.button({key:'deleteselection', onClick:this.handleDeleteSelection_}, label);
 	},
 
 	handleSelectionChange_: function(newSelection) {
@@ -463,7 +449,6 @@ cam.IndexPage = React.createClass({
 			history: this.props.history,
 			onSelectionChange: this.handleSelectionChange_,
 			paddingTop: this.HEADER_HEIGHT_,
-			scale: this.isSidebarOpen_() ? (1 - (this.SIDEBAR_WIDTH_ / this.getContentWidth_())) : 1,
 			scrolling: this.props.scrolling,
 			searchSession: this.searchSession_,
 			selection: this.state.selection,
@@ -526,9 +511,5 @@ cam.IndexPage = React.createClass({
 
 	getContentWidth_: function() {
 		return this.props.availWidth;
-	},
-
-	isSidebarOpen_: function() {
-		return Boolean(goog.object.getAnyKey(this.state.selection));
 	},
 });

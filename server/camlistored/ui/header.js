@@ -65,7 +65,7 @@ cam.Header = React.createClass({
 			{
 				className: React.addons.classSet({
 					'cam-header': true,
-					'cam-header-sub-active': this.props.children,
+					'cam-header-sub-active': this.props.children.some(function(c) { return c; }),
 				}),
 				style: {
 					width: this.props.width,
