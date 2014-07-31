@@ -146,10 +146,7 @@ cam.BlobItemContainerReact = React.createClass({
 		return React.DOM.div(
 			{
 				className: 'cam-blobitemcontainer',
-				style: cam.object.extend(this.props.style, cam.reactUtil.getVendorProps({
-					transform: 'scale3d(' + this.props.scale + ', ' + this.props.scale + ', 1)',
-					transformOrigin: 'left ' + this.getTransformOrigin_() * 100 + '% 0',
-				})),
+				style:this.props.style,
 				onMouseDown: this.handleMouseDown_
 			},
 			childControls
@@ -159,7 +156,6 @@ cam.BlobItemContainerReact = React.createClass({
 	getRenderedPosition_: function(y) {
 		var origin = this.getTransformOrigin_() * this.layoutHeight_;
 		var retval = origin + ((y - origin) * this.props.scale);
-		console.log(y, this.getTransformOrigin_(), this.layoutHeight_, origin, this.props.scale, retval);
 		return retval;
 	},
 

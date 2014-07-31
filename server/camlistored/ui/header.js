@@ -62,19 +62,24 @@ cam.Header = React.createClass({
 
 	render: function() {
 		return React.DOM.div(
-			null,
+			{
+				className: React.addons.classSet({
+					'cam-header': true,
+					'cam-header-sub-active': this.props.subActive,
+				}),
+				style: {
+					width: this.props.width,
+				},
+			},
 			React.DOM.div(
 				{
-					className: 'cam-header',
-					style: {
-						width: this.props.width,
-						height: this.props.height,
-					}
+					className: 'cam-header-main',
 				},
 				this.getMenu_(),
 				this.getSearchbox_(),
 				this.getSizes_()
 			),
+			this.getSubheader_(),
 			this.getMenuDropdown_()
 		)
 	},
@@ -188,6 +193,14 @@ cam.Header = React.createClass({
 				},
 			},
 			text
+		);
+	},
+
+	getSubheader_: function() {
+		return React.DOM.div(
+			{
+				className: 'cam-header-sub',
+			}
 		);
 	},
 

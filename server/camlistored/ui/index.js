@@ -223,12 +223,14 @@ cam.IndexPage = React.createClass({
 			onSearchRoots: this.handleShowSearchRoots_,
 			onSmaller: this.handleEnsmallen_,
 			ref: 'header',
+			subActive: this.isSidebarOpen_(),
 			timer: this.props.timer,
 			width: this.props.availWidth,
 		});
 	},
 
 	getSidebar_: function() {
+		return null;
 		if (!this.isSearchMode_(this.state.currentURL)) {
 			return null;
 		}

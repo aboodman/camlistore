@@ -1,20 +1,49 @@
 .cam-header {
-	background: #3a3a3a;
-	border-spacing: 0;
-	border-collapse: 0;
-	border-width: 0;
-	box-shadow: 0.1em 0 0.5em 0.1em rgba(0, 0, 0, 0.4);
-	color: #e4e4e4;
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 700;
 	font-size: 13px;
-	height: 36px;
 	left: 0;
 	position: fixed;
 	top: 0;
-	width: 100%;
 	z-index: 100;
 	-webkit-transform: translateZ(0);
+}
+
+.cam-header-main {
+	background: #3a3a3a;
+	box-shadow: 0.1em 0 0.5em 0.1em rgba(0, 0, 0, 0.4);
+	color: #e4e4e4;
+	height: 36px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	z-index: 3;
+}
+
+.cam-header.cam-header-sub-active .cam-header-main {
+	box-shadow: none;
+}
+
+.cam-header-sub {
+	background: #eee;
+	color: #333;
+	font-size: 12px;
+	font-weight: normal;
+	height: 36px;
+	left: 0;
+	position: absolute;
+	top: 36px;
+	width: 100%;
+	-webkit-transform: translate3d(0, -100%, 0);
+	-webkit-transition: transform 75ms ease-out;
+	z-index: 1;
+}
+
+.cam-header.cam-header-sub-active .cam-header-sub {
+	box-shadow: 0.1em 0 0.5em 0.1em rgba(0, 0, 0, 0.4);
+	opacity: 1;
+	-webkit-transform: translate3d(0, 0, 0);
 }
 
 .cam-header-item {
@@ -38,7 +67,7 @@
 	box-shadow: 0.1em 0 1em 0.3em rgba(0, 0, 0, 0.25);
 	cursor: default;
 	left: 0;
-	position: fixed;
+	position: absolute;
 	top: 38px;
 	transition: -webkit-transform 100ms ease-out;
 	transition: -moz-transform 100ms ease-out;
