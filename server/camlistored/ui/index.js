@@ -458,6 +458,7 @@ cam.IndexPage = React.createClass({
 			history: this.props.history,
 			onSelectionChange: this.handleSelectionChange_,
 			paddingTop: this.HEADER_HEIGHT_,
+			scale: this.isSidebarOpen_() ? (1 - (this.SIDEBAR_WIDTH_ / this.getContentWidth_())) : 1,
 			scrolling: this.props.scrolling,
 			searchSession: this.searchSession_,
 			selection: this.state.selection,
@@ -467,28 +468,13 @@ cam.IndexPage = React.createClass({
 	},
 
 	getBlobItemContainerStyle_: function() {
-		// TODO(aa): Constant values can go into CSS when we switch over to react.
-		var style = {
+		return {
 			left: 0,
 			position: 'absolute',
 			top: 0,
+			height: this.props.availHeight,
 			width: this.getContentWidth_(),
 		};
-
-		var closedWidth = style.width;
-		var openWidth = closedWidth - this.SIDEBAR_WIDTH_;
-		var openScale = openWidth / closedWidth;
-
-		// TODO(aa): This can move to CSS when the conversion to React is complete.
-		style[cam.reactUtil.getVendorProp('transformOrigin')] = 'left top 0';
-
-		// The 3d transform is important. See: https://code.google.com/p/camlistore/issues/detail?id=284.
-		var scale = this.isSidebarOpen_() ? openScale : 1;
-		style[cam.reactUtil.getVendorProp('transform')] = goog.string.subs('scale3d(%s, %s, 1)', scale, scale);
-
-		style.height = this.isSidebarOpen_() ? this.props.availHeight / scale : this.props.availHeight;
-
-		return style;
 	},
 
 	getDetailView_: function() {

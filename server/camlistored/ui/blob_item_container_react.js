@@ -143,7 +143,28 @@ cam.BlobItemContainerReact = React.createClass({
 		// If we haven't filled the window with results, add some more.
 		this.fillVisibleAreaWithResults_();
 
-		return React.DOM.div({className:'cam-blobitemcontainer', style:this.props.style, onMouseDown:this.handleMouseDown_}, childControls);
+		return React.DOM.div(
+			{
+				className: 'cam-blobitemcontainer',
+				style: cam.object.extend(this.props.style, cam.reactUtil.getVendorProps({
+					transform: 'scale3d(' + this.props.scale + ', ' + this.props.scale + ', 1)',
+					transformOrigin: 'left ' + this.getTransformOrigin_() * 100 + '% 0',
+				})),
+				onMouseDown: this.handleMouseDown_
+			},
+			childControls
+		);
+	},
+
+	getRenderedPosition_: function(y) {
+		var origin = this.getTransformOrigin_() * this.layoutHeight_;
+		var retval = origin + ((y - origin) * this.props.scale);
+		console.log(y, this.getTransformOrigin_(), this.layoutHeight_, origin, this.props.scale, retval);
+		return retval;
+	},
+
+	getTransformOrigin_: function() {
+		return this.state.scroll / (this.layoutHeight_ - this.props.style.height);
 	},
 
 	updateChildItems_: function() {
@@ -249,6 +270,7 @@ cam.BlobItemContainerReact = React.createClass({
 	},
 
 	isVisible_: function(y) {
+		y = this.getRenderedPosition_(y);
 		return y >= this.state.scroll && y < (this.state.scroll + this.props.style.height);
 	},
 
@@ -309,7 +331,7 @@ cam.BlobItemContainerReact = React.createClass({
 			return;
 		}
 
-		if ((this.layoutHeight_ - this.props.scrolling.get() - this.props.style.height) > this.INFINITE_SCROLL_THRESHOLD_PX_) {
+		if ((this.layoutHeight_ - this.state.scroll - this.props.style.height) > this.INFINITE_SCROLL_THRESHOLD_PX_) {
 			return;
 		}
 
